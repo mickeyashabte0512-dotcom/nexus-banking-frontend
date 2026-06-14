@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quantum Treasury | Premium Network Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #020617; --bg-card: #0f172a; --bg-card-hover: #1e293b; --bg-input: #1e293b;
+            --text-main: #f8fafc; --text-muted: #64748b; --primary: #38bdf8; --success: #10b981; --danger: #f43f5e; --border: #334155;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        
+        .ticker-wrap { width: 100%; background: #090d16; border-bottom: 1px solid var(--border); overflow: hidden; white-space: nowrap; padding: 10px 0; font-size: 0.75rem; font-family: monospace; }
+        .ticker-move { display: inline-block; animation: tickerSlide 30s linear infinite; }
+        .ticker-item { display: inline-block; margin-right: 40px; color: var(--text-muted); }
+        .ticker-item span { font-weight: bold; margin-left: 6px; }
+        @keyframes tickerSlide { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+        
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .brand-logo-space { display: flex; align-items: center; gap: 10px; }
+        .logo-box { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), #a855f7); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #020617; }
+        header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.5px; }
+        .sys-badge { font-size: 0.7rem; color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 12px; border-radius: 20px; background: rgba(16, 185, 129, 0.1); font-weight: 600; }
+        
+        nav { background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; padding: 4px; }
+        nav a { flex: 1; color: var(--text-muted); text-decoration: none; text-align: center; font-size: 0.8rem; font-weight: 600; padding: 12px 0; border-radius: 8px; cursor: pointer; }
+        nav a.active { background-color: var(--bg-input); color: var(--primary); }
+        
+        .view-content { padding: 24px 16px; flex: 1; display: none; max-width: 1400px; width: 100%; margin: 0 auto; }
+        .view-content.active-view { display: block; }
+        .grid-master { display: flex; flex-direction: column; gap: 24px; }
+        
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+        .card-header-label { font-size: 1.05rem; font-weight: 600; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px; }
+        
+        .account-matrix-slider { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px; }
+        .crypto-vault-card { flex: 0 0 300px; background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(255, 255, 255, 0.02); border-radius: 14px; padding: 20px; cursor: pointer; }
+        .crypto-vault-card.selected-pool { border-color: var(--primary); box-shadow: 0 0 20px rgba(56, 189, 248, 0.15); }
+        .crypto-vault-card h3 { font-size: 1.6rem; margin: 6px 0 14px 0; font-weight: 700; }
+        
+        .form-cluster { margin-bottom: 16px; }
+        .form-cluster label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        .form-cluster input, .form-cluster select { width: 100%; padding: 14px; background-color: #0f172a; border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 0.9rem; outline: none; }
+        
+        .spread-selector-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+        .spread-btn { background: #0f172a; border: 1px solid var(--border); padding: 10px; border-radius: 8px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; cursor: pointer; text-align: center; }
+        .spread-btn.active-spread { border-color: var(--primary); color: var(--primary); background: rgba(56, 189, 248, 0.05); }
+        
+        .quick-volume-strip { display: flex; gap: 8px; margin-bottom: 12px; }
+        .volume-pill { background: #1e293b; border: 1px solid var(--border); border-radius: 20px; padding: 6px 12px; color: white; font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        
+        .execution-master-btn { width: 100%; padding: 15px; background: linear-gradient(90deg, var(--primary), #a855f7); color: #020617; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .quick-action-strip { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+        .action-node-btn { background: #1e293b; border: 1px solid var(--border); border-radius: 10px; padding: 12px; color: white; font-size: 0.75rem; font-weight: 600; cursor: pointer; }
+        
+        .tx-scroll-chamber { display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; }
+        .ledger-row-item { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); padding: 14px; border-radius: 12px; font-size: 0.85rem; }
+        
+        .fx-matrix-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .fx-matrix-table th { color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: 0.7rem; }
+        .fx-matrix-table td { padding: 14px 12px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        
+        .conversion-result-box { background: #020617; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 16px; text-align: center; }
+        @media (min-width: 992px) { .grid-master { display: grid; grid-template-columns: 1.6fr 1.4fr; align-items: start; } .span-full-grid { grid-column: span 2; } }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-wrap">
+        <div class="ticker-move" id="live-ticker-track">
+            <div class="ticker-item">USD/ETB <span style="color:var(--success);" id="ticker-etb">-- ▲</span></div>
+            <div class="ticker-item">EUR/USD <span style="color:var(--danger);" id="ticker-eur">-- ▼</span></div>
+            <div class="ticker-item">USD/CNY <span style="color:var(--success);" id="ticker-cny">-- ▲</span></div>
+            <div class="ticker-item">USD/JPY <span style="color:var(--success);" id="ticker-jpy">-- ▲</span></div>
+            <div class="ticker-item">USD/KRW <span style="color:var(--danger);" id="ticker-krw">-- ▼</span></div>
+        </div>
+    </div>
+
+    <header>
+        <div class="brand-logo-space">
+            <div class="logo-box">Ξ</div>
+            <h1>QUANTUM PRO CAPITAL TERMINAL</h1>
+        </div>
+        <div class="sys-badge">● QUANT REAL-TIME CONNECTED</div>
+    </header>
+
+    <nav>
+        <a href="#dashboard" class="nav-link active" onclick="switchTab('dashboard')">Treasury Hub</a>
+        <a href="#fx-matrix" class="nav-link" onclick="switchTab('fx-matrix')">Exchange Analytics Matrix</a>
+        <a href="#converter" class="nav-link" onclick="switchTab('converter')">Omni Converter Matrix</a>
+    </nav>
+
+    <div id="dashboard" class="view-content active-view">
+        <h2 style="font-size:1.5rem; margin-bottom:2px;">Mickeyas Corporate Node Hub</h2>
+        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:24px;">Synchronized with Serverless Edge API layers.</p>
+
+        <div class="grid-master">
+            <div class="card span-full-grid">
+                <div class="card-header-label">Cloud Vault Accounts</div>
+                <div class="account-matrix-slider" id="vault-slider-root"></div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:24px;">
+                <div class="card">
+                    <div class="card-header-label">Cross-Border Routing Engine</div>
+                    <div class="quick-action-strip">
+                        <button class="action-node-btn" onclick="triggerServerFaucetMint()">Faucet Mint $50k</button>
+                        <button class="action-node-btn" onclick="loadSystemHardwareDataEnginePipeline()">Force Core Sync</button>
+                    </div>
+
+                    <div class="form-cluster">
+                        <label>FX Liquidity Tier Spread</label>
+                        <div class="spread-selector-group">
+                            <button class="spread-btn active-spread" id="spread-0" onclick="adjustActiveSpreadRate(0, this)">Interbank (0%)</button>
+                            <button class="spread-btn" id="spread-15" onclick="adjustActiveSpreadRate(0.015, this)">Standard (1.5%)</button>
+                            <button class="spread-btn" id="spread-35" onclick="adjustActiveSpreadRate(0.035, this)">Retail (3.5%)</button>
+                        </div>
+                    </div>
+
+                    <form id="global-wire-transfer-form">
+                        <div class="form-cluster">
+                            <label>Destination Payout Asset</label>
+                            <select id="wire-target-currency" onchange="calculateLiveWirePreview()">
+                                <option value="ETB">Ethiopian Birr (ETB)</option>
+                                <option value="EUR">European Euro (EUR)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                                <option value="JPY">Japanese Yen (JPY)</option>
+                                <option value="KRW">South Korean Won (KRW)</option>
+                                <option value="GBP">British Pound (GBP)</option>
+                            </select>
+                        </div>
+                        <div class="form-cluster">
+                            <label>Target Routing Address</label>
+                            <input type="text" id="wire-recipient" placeholder="e.g. IBAN-ET-89420" required>
+                        </div>
+                        <div class="form-cluster">
+                            <label>Volume Allocation ($ USD)</label>
+                            <div class="quick-volume-strip">
+                                <button type="button" class="volume-pill" onclick="injectQuickVolumeValue(500)">+$500</button>
+                                <button type="button" class="volume-pill" onclick="injectQuickVolumeValue(2500)">+$2.5k</button>
+                                <button type="button" class="volume-pill" onclick="injectQuickVolumeValue(10000)">+$10k</button>
+                            </div>
+                            <input type="number" id="wire-amount-usd" min="1" step="any" placeholder="0.00" oninput="calculateLiveWirePreview()" required>
+                        </div>
+                        
+                        <div style="font-size: 0.75rem; color: var(--primary); margin-bottom:14px; font-weight:500;" id="wire-preview-label">
+                            Estimated Payout: 0.00 ETB
+                        </div>
+                        <button type="submit" class="execution-master-btn">Transmit Settlement</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header-label">Live API Settlement Clearing Logs</div>
+                <div class="tx-scroll-chamber" id="audit-logs-dom-root"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fx-matrix" class="view-content">
+        <h2 style="font-size:1.4rem; margin-bottom:4px;">Advanced Global Liquidity Index Matrix</h2>
+        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">Comprehensive asset conversion analytics showing real-time market buy/sell values.</p>
+        <div class="card">
+            <table class="fx-matrix-table">
+                <thead>
+                    <tr>
+                        <th>Country Asset Vector</th>
+                        <th>Code</th>
+                        <th>Interbank Baseline Rate</th>
+                        <th>Corporate Bid (Buy)</th>
+                        <th>Corporate Ask (Sell)</th>
+                        <th>Spread Premium Status</th>
+                    </tr>
+                </thead>
+                <tbody id="fx-matrix-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="converter" class="view-content">
+        <h2 style="font-size:1.4rem; margin-bottom:16px;">FX Multi-Exchange Calculation Engine Matrix</h2>
+        <div class="card" style="max-width:650px; margin:0 auto;">
+            <div class="form-cluster"><label>Input Financial Value Quantity</label><input type="number" id="sandbox-input-value" value="100" oninput="executeOmniCalculatorConversion()"></div>
+            <div class="form-cluster"><label>Source Base Origin Asset</label><select id="sandbox-source-currency" onchange="executeOmniCalculatorConversion()"><option value="USD">USD - United States Dollar</option><option value="ETB">ETB - Ethiopian Birr</option><option value="EUR">EUR - European Euro</option><option value="CNY">CNY - Chinese Yuan</option><option value="JPY">JPY - Japanese Yen</option><option value="KRW">KRW - South Korean Won</option></select></div>
+            <div class="form-cluster"><label>Target Settlement Exchange Route</label><select id="sandbox-target-currency" onchange="executeOmniCalculatorConversion()"><option value="ETB">ETB - Ethiopian Birr</option><option value="USD">USD - United States Dollar</option><option value="EUR">EUR - European Euro</option><option value="CNY">CNY - Chinese Yuan</option><option value="JPY">JPY - Japanese Yen</option><option value="KRW">KRW - South Korean Won</option></select></div>
+            <div class="conversion-result-box"><span style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Calculated Core Valuation Result</span><h3 id="sandbox-conversion-output" style="font-size:1.6rem; color:var(--primary); font-weight:700;">0.00</h3></div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_API_URL = "https://nexus-banking-backend.vercel.app";
+
+        let GLOBAL_MARKET_EXCHANGE_REGISTRY = {
+            USD: { name: "United States Dollar", symbol: "$", rate: 1.00 },
+            ETB: { name: "Ethiopian Birr", symbol: "ETB", rate: 121.40 },
+            EUR: { name: "European Euro", symbol: "€", rate: 0.92 },
+            CNY: { name: "Chinese Yuan Renminbi", symbol: "¥", rate: 7.25 },
+            JPY: { name: "Japanese Yen", symbol: "¥", rate: 156.70 },
+            KRW: { name: "South Korean Won", symbol: "₩", rate: 1374.50 },
+            GBP: { name: "British Pound Sterling", symbol: "£", rate: 0.78 }
+        };
+
+        let activeRuntimeStateObject = { activeSelectedVaultIdx: 0, vaultCards: [], clearingAuditRegistryRecords: [] };
+        let activeSelectedSpreadFeePercent = 0; // Current fee setup
+
+        async function loadSystemHardwareDataEnginePipeline() {
+            try {
+                const vaultResponse = await fetch(`${BACKEND_API_URL}/api/vaults`);
+                activeRuntimeStateObject.vaultCards = await vaultResponse.json();
+
+                const ratesResponse = await fetch(`${BACKEND_API_URL}/api/rates`);
+                const ratesData = await ratesResponse.json();
+                
+                if (ratesData.success) {
+                    Object.keys(ratesData.rates).forEach(key => {
+                        if (GLOBAL_MARKET_EXCHANGE_REGISTRY[key]) {
+                            // Inject random micro-volatility fluctuations into real baseline numbers to simulate real trading desks
+                            const microVolatilityShift = 1 + ((Math.random() * 0.004) - 0.002); 
+                            GLOBAL_MARKET_EXCHANGE_REGISTRY[key].rate = ratesData.rates[key].rate * microVolatilityShift;
+                        }
+                    });
+                    updateTickerDisplayValues();
+                }
+                await refreshActiveLogsFromServer();
+            } catch (error) {
+                console.error("Core network connectivity pipeline failure:", error);
+            }
+            populateFxStaticReferenceMatrixTableUI();
+            synchronizeMasterInterfaceViewDisplays();
+            executeOmniCalculatorConversion();
+        }
+
+        async function refreshActiveLogsFromServer() {
+            const currentVault = activeRuntimeStateObject.vaultCards[activeRuntimeStateObject.activeSelectedVaultIdx];
+            if (!currentVault) return;
+            try {
+                const logsResponse = await fetch(`${BACKEND_API_URL}/api/logs/${currentVault.id}`);
+                activeRuntimeStateObject.clearingAuditRegistryRecords = await logsResponse.json();
+            } catch (e) { console.error(e); }
+        }
+
+        function updateTickerDisplayValues() {
+            document.getElementById('ticker-etb').innerText = `${GLOBAL_MARKET_EXCHANGE_REGISTRY.ETB.rate.toFixed(2)} ▲`;
+            document.getElementById('ticker-eur').innerText = `${GLOBAL_MARKET_EXCHANGE_REGISTRY.EUR.rate.toFixed(2)} ▼`;
+            document.getElementById('ticker-cny').innerText = `${GLOBAL_MARKET_EXCHANGE_REGISTRY.CNY.rate.toFixed(2)} ▲`;
+            document.getElementById('ticker-jpy').innerText = `${GLOBAL_MARKET_EXCHANGE_REGISTRY.JPY.rate.toFixed(2)} ▲`;
+            document.getElementById('ticker-krw').innerText = `${GLOBAL_MARKET_EXCHANGE_REGISTRY.KRW.rate.toFixed(2)} ▼`;
+        }
+
+        function adjustActiveSpreadRate(feeAmountDecimal, buttonElement) {
+            activeSelectedSpreadFeePercent = feeAmountDecimal;
+            document.querySelectorAll('.spread-btn').forEach(btn => btn.classList.remove('active-spread'));
+            buttonElement.classList.add('active-spread');
+            calculateLiveWirePreview();
+        }
+
+        function injectQuickVolumeValue(volumeSum) {
+            const currentInput = document.getElementById('wire-amount-usd');
+            const totalSum = (parseFloat(currentInput.value) || 0) + volumeSum;
+            currentInput.value = totalSum;
+            calculateLiveWirePreview();
+        }
+
+        function calculateLiveWirePreview() {
+            const selectedCurrencyKey = document.getElementById('wire-target-currency').value;
+            const inputAmountUSD = parseFloat(document.getElementById('wire-amount-usd').value) || 0;
+            
+            // Apply standard banking exchange math formulas: Output = Principal * Rate * (1 - Spread Fee)
+            const targetRate = GLOBAL_MARKET_EXCHANGE_REGISTRY[selectedCurrencyKey].rate;
+            const finalProcessedPayoutSum = inputAmountUSD * targetRate * (1 - activeSelectedSpreadFeePercent);
+            
+            document.getElementById('wire-preview-label').innerText = `Estimated Payout: ${finalProcessedPayoutSum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${selectedCurrencyKey}`;
+        }
+
+        function populateFxStaticReferenceMatrixTableUI() {
+            const tableBodyDOMTarget = document.getElementById('fx-matrix-table-body');
+            tableBodyDOMTarget.innerHTML = "";
+            Object.keys(GLOBAL_MARKET_EXCHANGE_REGISTRY).forEach(key => {
+                const row = GLOBAL_MARKET_EXCHANGE_REGISTRY[key];
+                const interbankBase = row.rate;
+                
+                // Real-world banking logic configuration profiles: Sell (Ask) slightly higher, Buy (Bid) slightly lower
+                const corporateBidBuy = interbankBase * 0.985;
+                const corporateAskSell = interbankBase * 1.015;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 500;">${row.name}</td>
+                    <td style='color:var(--primary); font-weight:600;'>${key}</td>
+                    <td>${interbankBase.toFixed(4)}</td>
+                    <td style="color:var(--success); font-weight:600;">${corporateBidBuy.toFixed(4)}</td>
+                    <td style="color:var(--danger); font-weight:600;">${corporateAskSell.toFixed(4)}</td>
+                    <td><span style='color:var(--primary); font-size:0.75rem; background:rgba(56,189,248,0.1); padding:2px 8px; border-radius:10px;'>±1.50% SPREAD</span></td>
+                `;
+                tableBodyDOMTarget.appendChild(tr);
+            });
+        }
+
+        function synchronizeMasterInterfaceViewDisplays() {
+            const sliderRootContainer = document.getElementById('vault-slider-root');
+            sliderRootContainer.innerHTML = "";
+            if (activeRuntimeStateObject.vaultCards.length === 0) return;
+
+            activeRuntimeStateObject.vaultCards.forEach((vault, positionIdx) => {
+                const elementCardBox = document.createElement('div');
+                elementCardBox.className = `crypto-vault-card ${activeRuntimeStateObject.activeSelectedVaultIdx === positionIdx ? 'selected-pool' : ''}`;
+                elementCardBox.onclick = async () => {
+                    activeRuntimeStateObject.activeSelectedVaultIdx = positionIdx;
+                    await refreshActiveLogsFromServer();
+                    synchronizeMasterInterfaceViewDisplays();
+                };
+                elementCardBox.innerHTML = `
+                    <p>${vault.title}</p>
+                    <h3>$${vault.balanceUSD.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD</h3>
+                    <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); border-top:1px solid rgba(255,255,255,0.05); padding-top:10px;">
+                        <span>${vault.id}</span><span style="color:var(--primary); font-weight:600;">${vault.code}</span>
+                    </div>`;
+                sliderRootContainer.appendChild(elementCardBox);
+            });
+            renderTreasuryClearingAuditHistoryLogs();
+            calculateLiveWirePreview();
+        }
+
+        document.getElementById('global-wire-transfer-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const chosenTargetCurrencyCodeStr = document.getElementById('wire-target-currency').value;
+            const routingAddressTargetDestination = document.getElementById('wire-recipient').value.trim();
+            const settlementValueUSD = parseFloat(document.getElementById('wire-amount-usd').value);
+            const currentVault = activeRuntimeStateObject.vaultCards[activeRuntimeStateObject.activeSelectedVaultIdx];
+
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/wire-transfer`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vaultId: currentVault.id, targetCurrency: chosenTargetCurrencyCodeStr, recipient: routingAddressTargetDestination, amountUSD: settlementValueUSD })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(result.message);
+                    await loadSystemHardwareDataEnginePipeline();
+                    document.getElementById('global-wire-transfer-form').reset();
+                } else { alert(`Error: ${result.error}`); }
+            } catch (err) { console.error(err); }
+        });
+
+        async function triggerServerFaucetMint() {
+            const currentVault = activeRuntimeStateObject.vaultCards[activeRuntimeStateObject.activeSelectedVaultIdx];
+            try {
+                const response = await fetch(`${BACKEND_API_URL}/api/utility/mint`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ vaultId: currentVault.id })
+                });
+                const resData = await response.json();
+                if (resData.success) {
+                    alert("Faucet injected $50,000.00 USD successfully!");
+                    await loadSystemHardwareDataEnginePipeline();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTreasuryClearingAuditHistoryLogs() {
+            const auditLogsDOMRootTarget = document.getElementById('audit-logs-dom-root');
+            auditLogsDOMRootTarget.innerHTML = "";
+            if (activeRuntimeStateObject.clearingAuditRegistryRecords.length === 0) {
+                auditLogsDOMRootTarget.innerHTML = "<div style='font-size:0.75rem; text-align:center; padding:20px; color:var(--text-muted);'>No logs loaded.</div>";
+                return;
+            }
+            activeRuntimeStateObject.clearingAuditRegistryRecords.forEach(log => {
+                const div = document.createElement('div'); div.className = "ledger-row-item";
+                div.innerHTML = `<div><div>${log.actionMessage}</div><span style='font-size:0.7rem; color:var(--text-muted);'>${log.timeStamp}</span></div><div class='tx-financial-val ${log.vectorType === 'minus' ? 'deduct-pool' : 'credit-pool'}'>${log.vectorType === 'minus' ? '-' : '+'}$${log.cashVolumeUSD.toFixed(2)}</div>`;
+                auditLogsDOMRootTarget.appendChild(div);
+            });
+        }
+
+        function executeOmniCalculatorConversion() {
+            const inputQuantityVal = parseFloat(document.getElementById('sandbox-input-value').value) || 0;
+            const src = document.getElementById('sandbox-source-currency').value;
+            const dest = document.getElementById('sandbox-target-currency').value;
+            const result = (inputQuantityVal / GLOBAL_MARKET_EXCHANGE_REGISTRY[src].rate) * GLOBAL_MARKET_EXCHANGE_REGISTRY[dest].rate;
+            document.getElementById('sandbox-conversion-output').innerText = `${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${dest}`;
+        }
+
+        function switchTab(targetTabElementIdString) {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active-view'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(targetTabElementIdString).classList.add('active-view');
+            event.currentTarget.classList.add('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', loadSystemHardwareDataEnginePipeline);
+    </script>
+</body>
+</html>
