@@ -17,21 +17,21 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.3s, color 0.3s; }
         body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; padding-bottom: 60px; }
         
-        /* Premium Security Gateway Overlay */
-        #auth-gateway { position: fixed; inset: 0; background: var(--bg-main); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; text-align: center; }
+        /* Premium Auth Gateway Overlays */
+        .gateway-overlay { position: fixed; inset: 0; background: var(--bg-main); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }
         
         /* App Header Layout */
         header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .user-profile { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
         .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #a855f7); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
         
         /* Dynamic Notification Center Banner */
-        #notification-banner { background: var(--primary); color: #020617; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 700; display: none; }
+        #notification-banner { background: var(--primary); color: #020617; padding: 10px; text-align: center; font-size: 0.8rem; font-weight: 700; display: none; position: fixed; top: 0; left:0; right:0; z-index: 3000; }
 
         /* Navigation Controls Grid */
-        nav { background: var(--bg-card); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); padding: 4px; }
-        nav button { background: none; border: none; color: var(--text-muted); padding: 12px 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border-radius: 8px; }
+        nav { background: var(--bg-card); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: repeat(5, 1fr); padding: 4px; }
+        nav button { background: none; border: none; color: var(--text-muted); padding: 12px 2px; font-size: 0.7rem; font-weight: 600; cursor: pointer; border-radius: 8px; }
         nav button.active { background: var(--bg-input); color: var(--primary); }
         
         /* Layout View Machinery */
@@ -53,40 +53,55 @@
         .card-chip { width: 40px; height: 30px; background: #fbbf24; border-radius: 6px; margin-bottom: 20px; }
         
         /* Interactive Chatbot Interface */
-        .chat-box { height: 200px; overflow-y: auto; background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; }
+        .chat-box { height: 180px; overflow-y: auto; background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; }
         .chat-bubble { margin-bottom: 8px; padding: 8px 12px; border-radius: 12px; max-width: 85%; }
         .chat-bot { background: var(--bg-input); color: var(--text-main); align-self: flex-start; }
         .chat-user { background: var(--primary); color: white; margin-left: auto; text-align: right; }
 
         /* Lists and Matrix Data Elements */
-        .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem; }
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
         .badge { font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
         .badge-success { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge-danger { background: rgba(244,63,94,0.15); color: var(--danger); }
+        
+        .history-container { max-height: 250px; overflow-y: auto; }
     </style>
 </head>
 <body>
 
-    <div id="auth-gateway">
+    <div id="notification-banner">System Alert Node Connected</div>
+
+    <div id="register-gateway" class="gateway-overlay" style="display: none;">
         <div class="auth-card">
-            <h2 style="margin-bottom:8px;">Quantum Security Node</h2>
-            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">Biometric Verification & Credentials Matrix</p>
-            <input type="text" id="login-user" class="input-box" placeholder="User Identifier Node / Phone">
-            <input type="password" id="login-pass" class="input-box" placeholder="Access Authentication Pin">
-            <button class="action-btn" onclick="executeSecureSystemAuthenticationLog()">Verify Identity Matrix (Face ID Sim)</button>
+            <h2 style="margin-bottom:8px;">Create Quantum Account</h2>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">Initialize your offline persistent wallet profile</p>
+            <input type="text" id="reg-name" class="input-box" placeholder="Full Legal Name">
+            <input type="text" id="reg-user" class="input-box" placeholder="Phone or Email Identifier">
+            <input type="password" id="reg-pass" class="input-box" placeholder="Secure Password Access Pin">
+            <button class="action-btn" onclick="executeSystemRegistration()">Register Profile Node</button>
         </div>
     </div>
 
-    <div id="notification-banner">System Alert Node Connected</div>
+    <div id="auth-gateway" class="gateway-overlay" style="display: none;">
+        <div class="auth-card">
+            <h2 style="margin-bottom:8px;">Quantum Security Node</h2>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">Biometric Verification & Credentials Matrix</p>
+            <input type="text" id="login-user" class="input-box" placeholder="User Identifier / Phone">
+            <input type="password" id="login-pass" class="input-box" placeholder="Access Authentication Pin">
+            <button class="action-btn" onclick="executeSecureSystemAuthenticationLog()">Verify Identity (Face ID Sim)</button>
+            <p style="margin-top:15px; font-size:0.75rem; color:var(--primary); cursor:pointer;" onclick="wipeLocalStorageAndReset()">Reset & Create New Account</p>
+        </div>
+    </div>
 
     <header>
-        <div class="user-profile" onclick="toggleInterfaceColorThemeMode()">
+        <div class="user-profile">
             <div class="avatar" id="avatar-letters">MH</div>
             <div>
                 <h4 style="font-size:0.85rem;" id="profile-name-string">Mickeyas Habte</h4>
                 <p style="color:var(--text-muted); font-size:0.65rem;">System Master Tier</p>
             </div>
         </div>
-        <button onclick="triggerManualAppLogoutSession()" style="background:none; border:1px solid var(--border); color:var(--text-main); font-size:0.7rem; padding:6px 12px; border-radius:8px; cursor:pointer;">Terminate Session</button>
+        <div style="font-size: 0.75rem; font-weight:700; color: var(--success);" id="connection-badge">● LIVE SYNCED</div>
     </header>
 
     <nav>
@@ -94,6 +109,7 @@
         <button class="nav-btn" onclick="switchNavPane('transfers', this)">Transfers</button>
         <button class="nav-btn" onclick="switchNavPane('advanced', this)">Advanced</button>
         <button class="nav-btn" onclick="switchNavPane('ai-quantum', this)">Quantum AI</button>
+        <button class="nav-btn" onclick="switchNavPane('settings', this)">Settings</button>
     </nav>
 
     <div id="pane-vault" class="view-pane active-pane">
@@ -195,28 +211,159 @@
         </div>
     </div>
 
-    <script>
-        // CORE APPLICATION RUNTIME STATE REGISTRY
-        let globalVaultAccountBalanceDecimal = 150000.00;
-        let activeSystemInterfaceColorThemeFlag = "dark";
+    <div id="pane-settings" class="view-pane">
+        <div class="card">
+            <div class="card-title">Interface Settings Matrix</div>
+            <button class="action-btn" style="background-color: var(--bg-input); color: var(--text-main); margin-bottom: 12px; border: 1px solid var(--border);" onclick="toggleInterfaceColorThemeMode()">
+                Toggle Visual Theme Framework (Light / Dark)
+            </button>
+            <button class="action-btn" style="background-color: var(--danger);" onclick="triggerManualAppLogoutSession()">
+                Terminate Terminal Session (Logout)
+            </button>
+        </div>
 
-        // 1. GATEWAY AUTHENTICATION MACHINERY
-        function executeSecureSystemAuthenticationLog() {
-            const userIdentifier = document.getElementById('login-user').value.trim();
-            if(!userIdentifier) { alert("Secure System Node: Please enter valid operational identity tokens."); return; }
+        <div class="card">
+            <div class="card-title">Persistent Transaction Ledger History</div>
+            <div class="history-container" id="ledger-history-viewport">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // BACKEND BASE URL INTERFACE COUPLING
+        const BACKEND_API_URL = "https://nexus-banking-backend.vercel.app";
+
+        // APP INTERNAL DATABASE CONFIGURATION
+        let appState = {
+            userAccountProfile: null,
+            isSessionAuthenticated: false,
+            walletBalanceUSD: 150000.00,
+            activeInterfaceTheme: "dark",
+            ledgerHistoryArray: [
+                { type: 'faucet', label: 'Serverless Faucet Ingestion', amount: 50000.00, polarity: '+' },
+                { type: 'debit', label: 'International Utility Clearing', amount: 120.00, polarity: '-' },
+                { type: 'debit', label: 'Mobile Airtime Infrastructure', amount: 45.00, polarity: '-' }
+            ]
+        };
+
+        // INITIAL LIFE-CYCLE HOOK MATRIX
+        window.addEventListener('DOMContentLoaded', () => {
+            loadApplicationPersistentDatabaseState();
+            pingBackendServiceConnectionNode();
+        });
+
+        // ASYNC SERVICE ALIVE CONNECTION CHECK
+        async function pingBackendServiceConnectionNode() {
+            const badge = document.getElementById('connection-badge');
+            try {
+                const response = await fetch(BACKEND_API_URL + '/api/rates').catch(() => fetch(BACKEND_API_URL));
+                if(response.ok) {
+                    badge.innerText = "● LIVE SYNCED";
+                    badge.style.color = "var(--success)";
+                } else {
+                    throw new Error();
+                }
+            } catch(e) {
+                badge.innerText = "● OFFLINE SIMULATION";
+                badge.style.color = "var(--danger)";
+            }
+        }
+
+        // DATABASE SAVE & LOAD ENGINE
+        function saveApplicationPersistentDatabaseState() {
+            localStorage.setItem('QUANTUM_TERMINAL_DATA_NODE', JSON.stringify(appState));
+        }
+
+        function loadApplicationPersistentDatabaseState() {
+            const compiledLocalSavedPayload = localStorage.getItem('QUANTUM_TERMINAL_DATA_NODE');
             
-            triggerGlobalApplicationNotificationBanner("Biometric Footprint Verified. Access Authorized.");
-            document.getElementById('auth-gateway').style.display = 'none';
+            if (!compiledLocalSavedPayload) {
+                // If brand new deployment: show Sign Up Gateway
+                document.getElementById('register-gateway').style.display = 'flex';
+                return;
+            }
+
+            appState = JSON.parse(compiledLocalSavedPayload);
+
+            // Handle Authentication Persistence
+            if (!appState.isSessionAuthenticated) {
+                document.getElementById('auth-gateway').style.display = 'flex';
+            } else {
+                document.getElementById('auth-gateway').style.display = 'none';
+                document.getElementById('register-gateway').style.display = 'none';
+            }
+
+            // Sync Visual Configuration Frameworks
+            if (appState.activeInterfaceTheme === 'light') {
+                document.body.classList.add('light-theme');
+            } else {
+                document.body.classList.remove('light-theme');
+            }
+
+            // Bind UI Strings
+            if (appState.userAccountProfile) {
+                document.getElementById('profile-name-string').innerText = appState.userAccountProfile.fullName;
+                const matches = appState.userAccountProfile.fullName.match(/\b(\w)/g);
+                document.getElementById('avatar-letters').innerText = matches ? matches.join('').toUpperCase().substring(0,2) : "MH";
+            }
+
+            updateMainWalletBalanceDisplayUI();
+            renderLedgerHistoryMatrix();
+        }
+
+        // AUTHENTICATION AND SIGN IN MANAGEMENT
+        function executeSystemRegistration() {
+            const name = document.getElementById('reg-name').value.trim();
+            const username = document.getElementById('reg-user').value.trim();
+            const securityPin = document.getElementById('reg-pass').value.trim();
+
+            if (!name || !username || !securityPin) {
+                alert("Profile Matrix Error: Compile all registration data parameters.");
+                return;
+            }
+
+            appState.userAccountProfile = { fullName: name, userId: username, pinCode: securityPin };
+            appState.isSessionAuthenticated = true;
+            
+            saveApplicationPersistentDatabaseState();
+            loadApplicationPersistentDatabaseState();
+            triggerGlobalApplicationNotificationBanner("Quantum Identity Core Saved. Profile Authenticated.");
+        }
+
+        function executeSecureSystemAuthenticationLog() {
+            const enteredIdentifier = document.getElementById('login-user').value.trim();
+            const enteredPin = document.getElementById('login-pass').value.trim();
+
+            if (enteredIdentifier === appState.userAccountProfile.userId && enteredPin === appState.userAccountProfile.pinCode) {
+                appState.isSessionAuthenticated = true;
+                saveApplicationPersistentDatabaseState();
+                document.getElementById('auth-gateway').style.display = 'none';
+                triggerGlobalApplicationNotificationBanner("Session Handshake Success. Welcome Back.");
+            } else {
+                alert("Security Authorization Rejected: Signature match failed.");
+            }
         }
 
         function triggerManualAppLogoutSession() {
-            document.getElementById('auth-gateway').style.display = 'flex';
+            appState.isSessionAuthenticated = false;
+            saveApplicationPersistentDatabaseState();
+            
             document.getElementById('login-user').value = '';
             document.getElementById('login-pass').value = '';
-            triggerGlobalApplicationNotificationBanner("Session Destroyed. Node Isolated.");
+            document.getElementById('auth-gateway').style.display = 'flex';
+            
+            switchNavPane('vault', document.querySelectorAll('.nav-btn')[0]);
+            triggerGlobalApplicationNotificationBanner("Terminal Session Destroyed safely.");
         }
 
-        // 2. RUNTIME UI VIEW MANAGER
+        function wipeLocalStorageAndReset() {
+            if(confirm("Are you sure you want to completely erase the profile history from this browser cache?")) {
+                localStorage.removeItem('QUANTUM_TERMINAL_DATA_NODE');
+                location.reload();
+            }
+        }
+
+        // VIEW RENDERING ENGINE
         function switchNavPane(paneTargetIdString, navigationButtonElement) {
             document.querySelectorAll('.view-pane').forEach(element => element.classList.remove('active-pane'));
             document.querySelectorAll('.nav-btn').forEach(element => element.classList.remove('active'));
@@ -225,37 +372,71 @@
             navigationButtonElement.classList.add('active');
         }
 
-        // 3. COLOR INTERFACE THEME MACHINERY
         function toggleInterfaceColorThemeMode() {
-            const documentBodyContainer = document.body;
-            if(activeSystemInterfaceColorThemeFlag === "dark") {
-                documentBodyContainer.classList.add('light-theme');
-                activeSystemInterfaceColorThemeFlag = "light";
-                triggerGlobalApplicationNotificationBanner("System View: Light Layout Mode Activated.");
+            if(appState.activeInterfaceTheme === "dark") {
+                appState.activeInterfaceTheme = "light";
+                document.body.classList.add('light-theme');
             } else {
-                documentBodyContainer.classList.remove('light-theme');
-                activeSystemInterfaceColorThemeFlag = "dark";
-                triggerGlobalApplicationNotificationBanner("System View: Tactical Dark Layout Mode Activated.");
+                appState.activeInterfaceTheme = "dark";
+                document.body.classList.remove('light-theme');
             }
+            saveApplicationPersistentDatabaseState();
+            triggerGlobalApplicationNotificationBanner(`Layout Configuration: Modifying layout theme.`);
         }
 
-        // 4. TRANSACTION & ROUTING ENGINES
         function updateMainWalletBalanceDisplayUI() {
-            document.getElementById('wallet-balance-display').innerText = `$${globalVaultAccountBalanceDecimal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+            document.getElementById('wallet-balance-display').innerText = `$${appState.walletBalanceUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
         }
 
+        // LEDGER GENERATOR UTILITY
+        function renderLedgerHistoryMatrix() {
+            const viewport = document.getElementById('ledger-history-viewport');
+            viewport.innerHTML = '';
+
+            if(appState.ledgerHistoryArray.length === 0) {
+                viewport.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.75rem; padding:20px;">No historical matrix items inside this node container.</p>`;
+                return;
+            }
+
+            // Display newest transactions first
+            [...appState.ledgerHistoryArray].reverse().forEach(tx => {
+                const row = document.createElement('div');
+                row.className = "data-row";
+                const isPositive = tx.polarity === '+';
+                row.innerHTML = `
+                    <span>${tx.label}</span>
+                    <strong style="color: ${isPositive ? 'var(--success)' : 'var(--danger)'};">
+                        ${tx.polarity} $${tx.amount.toLocaleString('en-US', {minimumFractionDigits:2})}
+                    </strong>
+                `;
+                viewport.appendChild(row);
+            });
+        }
+
+        function appendNewItemToLedger(labelString, valueFloat, polarSymbol) {
+            appState.ledgerHistoryArray.push({
+                label: labelString,
+                amount: valueFloat,
+                polarity: polarSymbol
+            });
+            saveApplicationPersistentDatabaseState();
+            renderLedgerHistoryMatrix();
+        }
+
+        // TRANSACTIONS PIPELINE
         function executeAssetTransmissionPipeline() {
             const routingKeyDestination = document.getElementById('tx-target-account').value.trim();
             const volumeAmountUSD = parseFloat(document.getElementById('tx-volume').value) || 0;
             const transferCadence = document.getElementById('tx-schedule-cadence').value;
 
             if(!routingKeyDestination || volumeAmountUSD <= 0) { alert("Invalid Operational Parameters."); return; }
-            if(volumeAmountUSD > globalVaultAccountBalanceDecimal) { alert("Liquidity Error: Insufficient asset volumes inside this node vault."); return; }
+            if(volumeAmountUSD > appState.walletBalanceUSD) { alert("Liquidity Error: Insufficient asset volumes inside vault."); return; }
 
             if(transferCadence === "instant") {
-                globalVaultAccountBalanceDecimal -= volumeAmountUSD;
+                appState.walletBalanceUSD -= volumeAmountUSD;
                 updateMainWalletBalanceDisplayUI();
-                triggerGlobalApplicationNotificationBanner(`Dispatched $${volumeAmountUSD} USD to Node ${routingKeyDestination} successfully.`);
+                appendNewItemToLedger(`Transfer to Wire Node: ${routingKeyDestination}`, volumeAmountUSD, '-');
+                triggerGlobalApplicationNotificationBanner(`Dispatched $${volumeAmountUSD} USD to Node ${routingKeyDestination}.`);
             } else {
                 triggerGlobalApplicationNotificationBanner(`Automation Core Configured: Scheduled ${transferCadence} transmission loop.`);
             }
@@ -266,16 +447,17 @@
             const providerName = document.getElementById('bill-provider').value.trim();
             const invoiceSumUSD = parseFloat(document.getElementById('bill-amount').value) || 0;
 
-            if(!providerName || invoiceSumUSD <= 0) { alert("Invoice Error: Complete payment field matrix elements."); return; }
-            if(invoiceSumUSD > globalVaultAccountBalanceDecimal) { alert("Insufficient clearing funds."); return; }
+            if(!providerName || invoiceSumUSD <= 0) { alert("Invoice Error: Complete payment fields."); return; }
+            if(invoiceSumUSD > appState.walletBalanceUSD) { alert("Insufficient clearing funds."); return; }
 
-            globalVaultAccountBalanceDecimal -= invoiceSumUSD;
+            appState.walletBalanceUSD -= invoiceSumUSD;
             updateMainWalletBalanceDisplayUI();
+            appendNewItemToLedger(`Bill Payment: ${providerName}`, invoiceSumUSD, '-');
             triggerGlobalApplicationNotificationBanner(`Settled invoice payload with ${providerName} for $${invoiceSumUSD} USD.`);
             document.getElementById('bill-amount').value = '';
         }
 
-        // 5. ADVANCED LOAN UNDERWRITING & ENGINE CONVERSIONS
+        // ANALYTICS & MATH TOOLS
         function runAdvancedFxConversionMatrix() {
             const amountInput = parseFloat(document.getElementById('fx-input-volume').value) || 0;
             const selectionSource = document.getElementById('fx-src-currency').value;
@@ -295,7 +477,6 @@
 
             if(requestedPrincipal <= 0 || durationMonths <= 0) { alert("Please compile underwriting matrix parameters."); return; }
 
-            // Commercial Interest Compounding Model: 6.5% standard annual percent weighting
             const flatAnnualInterestPercentWeight = 0.065;
             const monthlyPaymentResult = (requestedPrincipal * (1 + (flatAnnualInterestPercentWeight * (durationMonths / 12)))) / durationMonths;
 
@@ -311,7 +492,7 @@
             switchNavPane('transfers', document.querySelectorAll('.nav-btn')[1]);
         }
 
-        // 6. COGNITIVE AI NEURAL PROCESSING CHANNELS
+        // ARTIFICIAL INTELLIGENCE CHANNELS
         function transmitNeuralChatQueryPipeline() {
             const textInputField = document.getElementById('neural-user-input');
             const chatViewportDOM = document.getElementById('neural-chat-viewport');
@@ -319,7 +500,6 @@
 
             if(!systemQueryString) return;
 
-            // Generate user text bubble elements inside DOM view
             const userBubbleElement = document.createElement('div');
             userBubbleElement.className = "chat-bubble chat-user";
             userBubbleElement.innerText = systemQueryString;
@@ -328,18 +508,17 @@
             textInputField.value = '';
             chatViewportDOM.scrollTop = chatViewportDOM.scrollHeight;
 
-            // Dynamic rule-based cognitive processing model mock engine
             setTimeout(() => {
                 const systemResponseBubbleElement = document.createElement('div');
                 systemResponseBubbleElement.className = "chat-bubble chat-bot";
                 
                 const formattedQueryLower = systemQueryString.toLowerCase();
                 if(formattedQueryLower.includes("budget") || formattedQueryLower.includes("save")) {
-                    systemResponseBubbleElement.innerText = "Directive: Your current Fintech Enterprise Pool target is at 85%. Capital reserves are highly optimized. Suggesting $2,000 USD secondary transfer to complete the milestone early.";
-                } else if(formattedQueryLower.includes("anomal") || formattedQueryLower.includes("fraud")) {
-                    systemResponseBubbleElement.innerText = "System Analysis: Zero irregular cryptographic handshakes detected on the network cluster. Encryption paths are stable.";
+                    systemResponseBubbleElement.innerText = "Directive: Your balance parameters are highly optimized. Suggesting a structured savings target strategy to protect liquidity margins.";
+                } else if(formattedQueryLower.includes("anomal") || formattedQueryLower.includes("fraud") || formattedQueryLower.includes("history")) {
+                    systemResponseBubbleElement.innerText = `System Analysis: Active database records indicate ${appState.ledgerHistoryArray.length} recorded items inside your history ledger stack. No unexpected vectors verified.`;
                 } else {
-                    systemResponseBubbleElement.innerText = "Query processed by Cognitive Node. Capitalization margins and system configurations are running at peek serverless capability.";
+                    systemResponseBubbleElement.innerText = "Query processed by Cognitive Node. Capitalization margins and storage architectures are running at peak browser capability.";
                 }
                 
                 chatViewportDOM.appendChild(systemResponseBubbleElement);
@@ -347,7 +526,6 @@
             }, 750);
         }
 
-        // 7. BROADCAST ANNOUNCEMENT BANNER MACHINERY
         function triggerGlobalApplicationNotificationBanner(announcementStringMessage) {
             const bannerDOMNode = document.getElementById('notification-banner');
             bannerDOMNode.innerText = announcementStringMessage;
