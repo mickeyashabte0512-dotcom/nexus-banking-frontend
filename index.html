@@ -45,7 +45,7 @@
         
         /* Form Element Designs */
         .input-box { width: 100%; padding: 12px; background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px; color: var(--text-main); font-size: 0.85rem; margin-bottom: 12px; outline: none; }
-        .action-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+        .action-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-block; text-align: center; text-decoration: none; }
         .action-btn:hover { opacity: 0.9; }
 
         /* Premium Virtual Debit Card Layout */
@@ -53,10 +53,10 @@
         .card-chip { width: 40px; height: 30px; background: #fbbf24; border-radius: 6px; margin-bottom: 20px; }
         
         /* Interactive Chatbot Interface */
-        .chat-box { height: 180px; overflow-y: auto; background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; }
-        .chat-bubble { margin-bottom: 8px; padding: 8px 12px; border-radius: 12px; max-width: 85%; }
-        .chat-bot { background: var(--bg-input); color: var(--text-main); align-self: flex-start; }
-        .chat-user { background: var(--primary); color: white; margin-left: auto; text-align: right; }
+        .chat-box { height: 240px; overflow-y: auto; background: var(--bg-main); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 8px; }
+        .chat-bubble { padding: 8px 12px; border-radius: 12px; max-width: 85%; line-height: 1.4; word-wrap: break-word; }
+        .chat-bot { background: var(--bg-input); color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 2px; }
+        .chat-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
 
         /* Lists and Matrix Data Elements */
         .data-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
@@ -65,6 +65,11 @@
         .badge-danger { background: rgba(244,63,94,0.15); color: var(--danger); }
         
         .history-container { max-height: 250px; overflow-y: auto; }
+        
+        /* Beneficiary Badges Horizontal List */
+        .beneficiary-flex { display: flex; gap: 10px; overflow-x: auto; padding: 4px 0 12px 0; }
+        .beneficiary-chip { background: var(--bg-main); border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+        .beneficiary-chip:hover { border-color: var(--primary); color: var(--primary); }
     </style>
 </head>
 <body>
@@ -85,10 +90,16 @@
     <div id="auth-gateway" class="gateway-overlay" style="display: none;">
         <div class="auth-card">
             <h2 style="margin-bottom:8px;">Quantum Security Node</h2>
-            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:20px;">Biometric Verification & Credentials Matrix</p>
+            <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:15px;">Biometric Verification & Credentials Matrix</p>
             <input type="text" id="login-user" class="input-box" placeholder="User Identifier / Phone">
             <input type="password" id="login-pass" class="input-box" placeholder="Access Authentication Pin">
-            <button class="action-btn" onclick="executeSecureSystemAuthenticationLog()">Verify Identity (Face ID Sim)</button>
+            
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:15px; font-size:0.8rem; color:var(--text-muted);">
+                <input type="checkbox" id="login-otp-toggle" style="cursor:pointer;">
+                <label for="login-otp-toggle" style="cursor:pointer;">Require Secure 2FA Simulation OTP</label>
+            </div>
+            
+            <button class="action-btn" onclick="executeSecureSystemAuthenticationLog()">Verify Identity</button>
             <p style="margin-top:15px; font-size:0.75rem; color:var(--primary); cursor:pointer;" onclick="wipeLocalStorageAndReset()">Reset & Create New Account</p>
         </div>
     </div>
@@ -128,9 +139,8 @@
 
         <div class="card">
             <div class="card-title">Real-Time Spending Analytics</div>
-            <div class="data-row"><span>Mobile Airtime Infrastructure</span><strong>- $45.00</strong></div>
-            <div class="data-row"><span>International Utility Clearing</span><strong>- $120.00</strong></div>
-            <div class="data-row"><span>Serverless Faucet Ingestion</span><strong style="color:var(--success);">+ $50,000.00</strong></div>
+            <div id="analytics-spending-rows">
+                </div>
         </div>
 
         <div class="card">
@@ -144,8 +154,12 @@
 
     <div id="pane-transfers" class="view-pane">
         <div class="card">
-            <div class="card-title">Cross-Border Asset Transmission</div>
-            <input type="text" id="tx-target-account" class="input-box" placeholder="Target Destination Routing Key">
+            <div class="card-title">Quick Transfer Shortcuts</div>
+            <div class="beneficiary-flex" id="beneficiary-shortcut-list">
+                </div>
+            
+            <div class="card-title" style="font-size:0.85rem; color:var(--text-main);">Cross-Border Asset Transmission</div>
+            <input type="text" id="tx-target-account" class="input-box" placeholder="Target Destination Routing Key or Name">
             <input type="number" id="tx-volume" class="input-box" placeholder="Transmission Quantity ($ USD)">
             <select id="tx-schedule-cadence" class="input-box">
                 <option value="instant">Execute Immediately</option>
@@ -194,10 +208,10 @@
         <div class="card">
             <div class="card-title">Cognitive Banking Neural Assistant</div>
             <div class="chat-box" id="neural-chat-viewport">
-                <div class="chat-bubble chat-bot">System Online. Inquire about optimization parameters, budget models, or anomalies.</div>
+                <div class="chat-bubble chat-bot">System Online. Hello Mickeyas! Ask me about your balance, track recent spending history, or request financial budget optimization metrics.</div>
             </div>
             <div style="display:flex; gap:8px;">
-                <input type="text" id="neural-user-input" style="margin-bottom:0;" class="input-box" placeholder="Ask AI Assistant...">
+                <input type="text" id="neural-user-input" style="margin-bottom:0;" class="input-box" placeholder="Ask AI (e.g. 'what is my balance' or 'check history')...">
                 <button class="action-btn" style="width:auto; padding:0 20px;" onclick="transmitNeuralChatQueryPipeline()">Send</button>
             </div>
         </div>
@@ -216,6 +230,9 @@
             <div class="card-title">Interface Settings Matrix</div>
             <button class="action-btn" style="background-color: var(--bg-input); color: var(--text-main); margin-bottom: 12px; border: 1px solid var(--border);" onclick="toggleInterfaceColorThemeMode()">
                 Toggle Visual Theme Framework (Light / Dark)
+            </button>
+            <button class="action-btn" style="background-color: #a855f7; color: white; margin-bottom: 12px; border: none;" onclick="triggerBankStatementDownloadSimulation()">
+                Download Official Bank Statement (PDF Sim)
             </button>
             <button class="action-btn" style="background-color: var(--danger);" onclick="triggerManualAppLogoutSession()">
                 Terminate Terminal Session (Logout)
@@ -239,6 +256,7 @@
             isSessionAuthenticated: false,
             walletBalanceUSD: 150000.00,
             activeInterfaceTheme: "dark",
+            favoriteBeneficiaries: ["Ethio Telecom", "Acode Node", "GitHub Mainframe", "Alex Wire"],
             ledgerHistoryArray: [
                 { type: 'faucet', label: 'Serverless Faucet Ingestion', amount: 50000.00, polarity: '+' },
                 { type: 'debit', label: 'International Utility Clearing', amount: 120.00, polarity: '-' },
@@ -250,6 +268,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadApplicationPersistentDatabaseState();
             pingBackendServiceConnectionNode();
+            buildBeneficiaryShortcutChips();
         });
 
         // ASYNC SERVICE ALIVE CONNECTION CHECK
@@ -278,7 +297,6 @@
             const compiledLocalSavedPayload = localStorage.getItem('QUANTUM_TERMINAL_DATA_NODE');
             
             if (!compiledLocalSavedPayload) {
-                // If brand new deployment: show Sign Up Gateway
                 document.getElementById('register-gateway').style.display = 'flex';
                 return;
             }
@@ -333,8 +351,18 @@
         function executeSecureSystemAuthenticationLog() {
             const enteredIdentifier = document.getElementById('login-user').value.trim();
             const enteredPin = document.getElementById('login-pass').value.trim();
+            const otpChecked = document.getElementById('login-otp-toggle').checked;
 
             if (enteredIdentifier === appState.userAccountProfile.userId && enteredPin === appState.userAccountProfile.pinCode) {
+                if(otpChecked) {
+                    const simulatedOtp = Math.floor(100000 + Math.random() * 900000);
+                    const promptInput = prompt(`[2FA OTP SIMULATION] Enter verification code sent to security node line:\nCode: ${simulatedOtp}`);
+                    if(promptInput !== String(simulatedOtp)) {
+                        alert("Access Refused: Secure Token Signature verification failed.");
+                        return;
+                    }
+                }
+                
                 appState.isSessionAuthenticated = true;
                 saveApplicationPersistentDatabaseState();
                 document.getElementById('auth-gateway').style.display = 'none';
@@ -385,21 +413,44 @@
         }
 
         function updateMainWalletBalanceDisplayUI() {
-            document.getElementById('wallet-balance-display').innerText = `$${appState.walletBalanceUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+            const formattedBalance = `$${appState.walletBalanceUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+            document.getElementById('wallet-balance-display').innerText = formattedBalance;
+        }
+
+        // CHIPS GENERATOR FOR BENEFICIARIES
+        function buildBeneficiaryShortcutChips() {
+            const list = document.getElementById('beneficiary-shortcut-list');
+            list.innerHTML = '';
+            appState.favoriteBeneficiaries.forEach(name => {
+                const chip = document.createElement('div');
+                chip.className = "beneficiary-chip";
+                chip.innerText = name;
+                chip.onclick = () => {
+                    document.getElementById('tx-target-account').value = name;
+                    triggerGlobalApplicationNotificationBanner(`Selected Beneficiary: ${name}`);
+                };
+                list.appendChild(chip);
+            });
         }
 
         // LEDGER GENERATOR UTILITY
         function renderLedgerHistoryMatrix() {
             const viewport = document.getElementById('ledger-history-viewport');
+            const dashboardSpendContainer = document.getElementById('analytics-spending-rows');
+            
             viewport.innerHTML = '';
+            dashboardSpendContainer.innerHTML = '';
 
             if(appState.ledgerHistoryArray.length === 0) {
-                viewport.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.75rem; padding:20px;">No historical matrix items inside this node container.</p>`;
+                viewport.innerHTML = `<p style="color:var(--text-muted); text-align:center; font-size:0.75rem; padding:20px;">No historical matrix items.</p>`;
+                dashboardSpendContainer.innerHTML = `<p style="color:var(--text-muted); font-size:0.75rem;">No active spending elements.</p>`;
                 return;
             }
 
-            // Display newest transactions first
-            [...appState.ledgerHistoryArray].reverse().forEach(tx => {
+            const cleanHistory = [...appState.ledgerHistoryArray].reverse();
+
+            // Render Core Settings Ledger
+            cleanHistory.forEach(tx => {
                 const row = document.createElement('div');
                 row.className = "data-row";
                 const isPositive = tx.polarity === '+';
@@ -410,6 +461,20 @@
                     </strong>
                 `;
                 viewport.appendChild(row);
+            });
+
+            // Populate Main Vault spending analytics view with the 3 most recent entries
+            cleanHistory.slice(0, 3).forEach(tx => {
+                const row = document.createElement('div');
+                row.className = "data-row";
+                const isPositive = tx.polarity === '+';
+                row.innerHTML = `
+                    <span>${tx.label}</span>
+                    <strong style="color: ${isPositive ? 'var(--success)' : 'var(--danger)'};">
+                        ${isPositive ? '' : '-'}$${tx.amount.toLocaleString('en-US', {minimumFractionDigits:2})}
+                    </strong>
+                `;
+                dashboardSpendContainer.appendChild(row);
             });
         }
 
@@ -435,8 +500,8 @@
             if(transferCadence === "instant") {
                 appState.walletBalanceUSD -= volumeAmountUSD;
                 updateMainWalletBalanceDisplayUI();
-                appendNewItemToLedger(`Transfer to Wire Node: ${routingKeyDestination}`, volumeAmountUSD, '-');
-                triggerGlobalApplicationNotificationBanner(`Dispatched $${volumeAmountUSD} USD to Node ${routingKeyDestination}.`);
+                appendNewItemToLedger(`Transfer to ${routingKeyDestination}`, volumeAmountUSD, '-');
+                triggerGlobalApplicationNotificationBanner(`Dispatched $${volumeAmountUSD} USD to ${routingKeyDestination}.`);
             } else {
                 triggerGlobalApplicationNotificationBanner(`Automation Core Configured: Scheduled ${transferCadence} transmission loop.`);
             }
@@ -492,7 +557,34 @@
             switchNavPane('transfers', document.querySelectorAll('.nav-btn')[1]);
         }
 
-        // ARTIFICIAL INTELLIGENCE CHANNELS
+        // PDF BANK STATEMENT BUILDER GENERATOR
+        function triggerBankStatementDownloadSimulation() {
+            let statementText = `==================================================\n`;
+            statementText += `          QUANTUM CAPITAL MANAGEMENT HUB          \n`;
+            statementText += `          OFFICIAL RUNTIME ACCOUNT STATEMENT       \n`;
+            statementText += `==================================================\n\n`;
+            statementText += `Holder Name: ${appState.userAccountProfile?.fullName || 'Mickeyas Habte'}\n`;
+            statementText += `Node ID Key: ${appState.userAccountProfile?.userId || 'Unknown'}\n`;
+            statementText += `Current Vault Balance: $${appState.walletBalanceUSD.toFixed(2)} USD\n`;
+            statementText += `--------------------------------------------------\n`;
+            statementText += `TRANSACTION HISTORY LOG:\n`;
+            
+            appState.ledgerHistoryArray.forEach((tx, idx) => {
+                statementText += `[${idx + 1}] ${tx.label} : ${tx.polarity}$${tx.amount.toFixed(2)}\n`;
+            });
+            
+            statementText += `\n==================================================\n`;
+            statementText += `Generated on System Date Framework - End of Node Session\n`;
+
+            const blob = new Blob([statementText], { type: 'text/plain' });
+            const linkElement = document.createElement('a');
+            linkElement.download = "Quantum_Account_Statement.txt";
+            linkElement.href = window.URL.createObjectURL(blob);
+            linkElement.click();
+            triggerGlobalApplicationNotificationBanner("Statement log txt compiled and downloaded.");
+        }
+
+        // DYNAMIC COGNITIVE ARTIFICIAL INTELLIGENCE CHANNELS
         function transmitNeuralChatQueryPipeline() {
             const textInputField = document.getElementById('neural-user-input');
             const chatViewportDOM = document.getElementById('neural-chat-viewport');
@@ -500,6 +592,7 @@
 
             if(!systemQueryString) return;
 
+            // Generate user message chat bubble
             const userBubbleElement = document.createElement('div');
             userBubbleElement.className = "chat-bubble chat-user";
             userBubbleElement.innerText = systemQueryString;
@@ -508,22 +601,37 @@
             textInputField.value = '';
             chatViewportDOM.scrollTop = chatViewportDOM.scrollHeight;
 
+            // Process response using dynamic contextual analytics rules
             setTimeout(() => {
                 const systemResponseBubbleElement = document.createElement('div');
                 systemResponseBubbleElement.className = "chat-bubble chat-bot";
                 
-                const formattedQueryLower = systemQueryString.toLowerCase();
-                if(formattedQueryLower.includes("budget") || formattedQueryLower.includes("save")) {
-                    systemResponseBubbleElement.innerText = "Directive: Your balance parameters are highly optimized. Suggesting a structured savings target strategy to protect liquidity margins.";
-                } else if(formattedQueryLower.includes("anomal") || formattedQueryLower.includes("fraud") || formattedQueryLower.includes("history")) {
-                    systemResponseBubbleElement.innerText = `System Analysis: Active database records indicate ${appState.ledgerHistoryArray.length} recorded items inside your history ledger stack. No unexpected vectors verified.`;
-                } else {
-                    systemResponseBubbleElement.innerText = "Query processed by Cognitive Node. Capitalization margins and storage architectures are running at peak browser capability.";
+                const queryLower = systemQueryString.toLowerCase();
+                
+                if (queryLower.includes("hello") || queryLower.includes("hi ") || queryLower.includes("hey")) {
+                    systemResponseBubbleElement.innerText = `Hello ${appState.userAccountProfile?.fullName || 'User'}! I am your Quantum Engine Assistant. How can I guide your asset tracking queries today?`;
+                } 
+                else if (queryLower.includes("balance") || queryLower.includes("money") || queryLower.includes("how much")) {
+                    systemResponseBubbleElement.innerText = `Your total available liquid capital is currently $${appState.walletBalanceUSD.toLocaleString('en-US', {minimumFractionDigits: 2})} USD. All nodes are reporting stable values.`;
+                } 
+                else if (queryLower.includes("history") || queryLower.includes("recent") || queryLower.includes("transaction") || queryLower.includes("spent")) {
+                    const lastTx = appState.ledgerHistoryArray[appState.ledgerHistoryArray.length - 1];
+                    systemResponseBubbleElement.innerText = `Your storage node holds ${appState.ledgerHistoryArray.length} active logs. Your last recorded interaction was: "${lastTx.label}" for ${lastTx.polarity}$${lastTx.amount}. Go to the 'Settings' tab to inspect the complete timeline matrix.`;
+                } 
+                else if (queryLower.includes("budget") || queryLower.includes("save") || queryLower.includes("optimize")) {
+                    const potentialSavings = appState.walletBalanceUSD * 0.15;
+                    systemResponseBubbleElement.innerText = `Directive Algorithm: Based on your $${appState.walletBalanceUSD.toLocaleString()} capital pool, I recommend isolating a 15% safety threshold ($${potentialSavings.toLocaleString()} USD) into your Fintech Enterprise Savings pool to compound security parameters.`;
+                } 
+                else if (queryLower.includes("help") || queryLower.includes("what can you do")) {
+                    systemResponseBubbleElement.innerText = "I can analyze your system runtime telemetry! Try asking me: 'What is my current balance?', 'Show last transaction details', or 'Give me a budget directive suggestion'.";
+                } 
+                else {
+                    systemResponseBubbleElement.innerText = `Received command packet: "${systemQueryString}". The analysis node confirms that your current capital asset matrix is fully balanced, secure, and processing fine at peak capacity. Let me know if you need specific spending checks!`;
                 }
                 
                 chatViewportDOM.appendChild(systemResponseBubbleElement);
                 chatViewportDOM.scrollTop = chatViewportDOM.scrollHeight;
-            }, 750);
+            }, 550);
         }
 
         function triggerGlobalApplicationNotificationBanner(announcementStringMessage) {
