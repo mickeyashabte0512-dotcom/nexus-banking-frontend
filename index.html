@@ -132,9 +132,9 @@
 
     <header>
         <div class="user-profile">
-            <div class="avatar" id="avatar-letters">MH</div>
+            <div class="avatar" id="avatar-letters">--</div>
             <div>
-                <h4 style="font-size:0.85rem;" id="profile-name-string">Mickeyas Habte</h4>
+                <h4 style="font-size:0.85rem;" id="profile-name-string">Connecting Profile...</h4>
                 <p style="color:var(--text-muted); font-size:0.65rem;">System Master Tier</p>
             </div>
         </div>
@@ -268,7 +268,7 @@
             </div>
 
             <div class="chat-box" id="neural-chat-viewport">
-                <div class="chat-bubble chat-bot">System Online. Hello Mickeyas! Ask me about your balance, track recent spending history, or request financial budget optimization metrics.</div>
+                <div class="chat-bubble chat-bot" id="dynamic-ai-greeting">System Online. Terminal environment authenticated. Ask me about your balance, track recent spending history, or request financial budget optimization metrics.</div>
             </div>
             <div style="display:flex; gap:8px;">
                 <input type="text" id="neural-user-input" style="margin-bottom:0;" class="input-box" placeholder="Ask AI (e.g. 'what is my balance' or 'check history')...">
@@ -446,11 +446,18 @@
                 freezeBtn.style.background = "var(--danger)";
             }
 
-            // Bind UI Strings
-            if (appState.userAccountProfile) {
-                document.getElementById('profile-name-string').innerText = appState.userAccountProfile.fullName;
-                const matches = appState.userAccountProfile.fullName.match(/\b(\w)/g);
-                document.getElementById('avatar-letters').innerText = matches ? matches.join('').toUpperCase().substring(0,2) : "MH";
+            // BIND DYNAMIC DATA PROFILE KEYS
+            if (appState.userAccountProfile && appState.userAccountProfile.fullName) {
+                const currentUserName = appState.userAccountProfile.fullName;
+                document.getElementById('profile-name-string').innerText = currentUserName;
+                
+                const matches = currentUserName.match(/\b(\w)/g);
+                document.getElementById('avatar-letters').innerText = matches ? matches.join('').toUpperCase().substring(0,2) : "AU";
+                
+                document.getElementById('dynamic-ai-greeting').innerText = `System Online. Hello ${currentUserName}! Ask me about your balance, track recent spending history, or request financial budget optimization metrics.`;
+            } else {
+                document.getElementById('profile-name-string').innerText = "Authorized User";
+                document.getElementById('avatar-letters').innerText = "AU";
             }
 
             updateMainWalletBalanceDisplayUI();
@@ -573,6 +580,7 @@
                 saveApplicationPersistentDatabaseState();
                 document.getElementById('auth-gateway').style.display = 'none';
                 triggerGlobalApplicationNotificationBanner("Session Handshake Success. Welcome Back.");
+                loadApplicationPersistentDatabaseState();
             } else {
                 alert("Security Authorization Rejected: Signature match failed.");
             }
@@ -760,6 +768,7 @@
             liveTickerDisplay.innerText = `1 ${srcCurrency} = ${absoluteCrossRateUnit.toFixed(4)} ${targetCurrency}`;
         }
 
+        // RISK ASSESSMENT PARAMETERS
         function runLoanUnderwritingSimulation() {
             const requestedPrincipal = parseFloat(document.getElementById('loan-principal').value) || 0;
             const durationMonths = parseInt(document.getElementById('loan-duration').value) || 0;
@@ -782,13 +791,14 @@
             switchNavPane('transfers', document.querySelectorAll('.nav-btn')[1]);
         }
 
-        // PDF BANK STATEMENT BUILDER GENERATOR
+        // TEXT ACCOUNT LOG STATEMENTS COMPILER
         function triggerBankStatementDownloadSimulation() {
+            const currentProfileName = appState.userAccountProfile?.fullName || 'Authorized User';
             let statementText = `==================================================\n`;
             statementText += `          QUANTUM CAPITAL MANAGEMENT HUB          \n`;
             statementText += `          OFFICIAL RUNTIME ACCOUNT STATEMENT       \n`;
             statementText += `==================================================\n\n`;
-            statementText += `Holder Name: ${appState.userAccountProfile?.fullName || 'Mickeyas Habte'}\n`;
+            statementText += `Holder Name: ${currentProfileName}\n`;
             statementText += `Node ID Key: ${appState.userAccountProfile?.userId || 'Unknown'}\n`;
             statementText += `Current Vault Balance: $${appState.walletBalanceUSD.toFixed(2)} USD\n`;
             statementText += `--------------------------------------------------\n`;
@@ -803,7 +813,7 @@
 
             const blob = new Blob([statementText], { type: 'text/plain' });
             const linkElement = document.createElement('a');
-            linkElement.download = "Quantum_Account_Statement.txt";
+            linkElement.download = `${currentProfileName.replace(/\s+/g, '_')}_Quantum_Statement.txt`;
             linkElement.href = window.URL.createObjectURL(blob);
             linkElement.click();
             triggerGlobalApplicationNotificationBanner("Statement log txt compiled and downloaded.");
@@ -838,6 +848,7 @@
                 systemResponseBubbleElement.className = "chat-bubble chat-bot";
                 
                 const queryLower = systemQueryString.toLowerCase();
+                const currentProfileName = appState.userAccountProfile?.fullName || 'User';
                 
                 // Macro Presentation Structural Matches
                 if (systemQueryString.includes("⚡")) {
@@ -850,7 +861,7 @@
                     systemResponseBubbleElement.innerText = `[REPLY]: Ledger diagnostic arrays reporting stable. Current total account capacity is fully calibrated. Transaction distributions are matching design criteria bounds perfectly.`;
                 }
                 else if (queryLower.includes("hello") || queryLower.includes("hi ") || queryLower.includes("hey")) {
-                    systemResponseBubbleElement.innerText = `Hello ${appState.userAccountProfile?.fullName || 'User'}! I am your Quantum Engine Assistant. How can I guide your asset tracking queries today?`;
+                    systemResponseBubbleElement.innerText = `Hello ${currentProfileName}! I am your Quantum Engine Assistant. How can I guide your asset tracking queries today?`;
                 } 
                 else if (queryLower.includes("balance") || queryLower.includes("money") || queryLower.includes("how much")) {
                     systemResponseBubbleElement.innerText = `Your total available liquid capital is currently $${appState.walletBalanceUSD.toLocaleString('en-US', {minimumFractionDigits: 2})} USD. All nodes are reporting stable values.`;
@@ -884,3 +895,4 @@
     </script>
 </body>
 </html>
+
